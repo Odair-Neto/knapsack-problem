@@ -2,10 +2,10 @@ import random
 import logging
 from table_test import valores, pesos, tamanhos
 
-logging.basicConfig(level=logging.INFO, filename="test_POP50_MAXITER2000_PM0_1.log", format="")
+logging.basicConfig(level=logging.INFO, filename="test_POP100_MAXITER300_PM10V095_1.log", format="")
 
-PROBABILIDADE_MUTACAO = 0
-MAX_ITERACOES = 2000
+PROBABILIDADE_MUTACAO = 0.05
+MAX_ITERACOES = 500
 POPULACAO = 50
 
 NUMERO_ITENS = 1000
@@ -15,6 +15,7 @@ PESO_MAX = 20000
 choice = [0,1]
 individuos = []
 selecionados = []
+ciclos_total = 0
 
 class Population:
     def __init__(self):
@@ -84,6 +85,7 @@ def cruzamento(selecionado1, selecionado2, corte, bool):
 
 
 if __name__ == '__main__':
+
     for _ in range(1,POPULACAO+1):
         individuos.append(Population())
         selecionados.append(Population())
@@ -101,14 +103,17 @@ if __name__ == '__main__':
         print('Iteração ')
         print(i)
         #logging.info(i)
-        logging.info('\'')
+        #logging.info(',')
         soma_avaliativa = 0
+        aux = True
         for individuo in individuos:
             individuo.avaliativa=avaliativa(individuo)
             soma_avaliativa += individuo.avaliativa
             print('avaliativa:')
             print(individuo.avaliativa)
-            logging.info(individuo.avaliativa)
+            if aux:
+                aux = False
+                logging.info(individuo.avaliativa)
         for individuo in individuos:
             individuo.ap = individuo.avaliativa/soma_avaliativa
                 
@@ -120,16 +125,17 @@ if __name__ == '__main__':
         print(choice_weights)
         selecionados = random.choices(individuos, choice_weights, k = POPULACAO)
 
-        for par in range(1,int(POPULACAO/2)):
+        for par in range(0,int(POPULACAO/2)):
             corte = random.randint(1,NUMERO_ITENS-2)
-            individuos[par].vetor = cruzamento(selecionados[par], selecionados[par+1], corte, False)
-            individuos[par+1].vetor = cruzamento(selecionados[par], selecionados[par+1], corte, True)
+            individuos[2*par].vetor = cruzamento(selecionados[2*par], selecionados[2*par+1], corte, False)
+            individuos[2*par+1].vetor = cruzamento(selecionados[2*par], selecionados[2*par+1], corte, True)
             print(individuos[par].vetor)
             # print('vetor ', par, ' = ',selecionados[par].vetor)
             # print('vetor ', par+1, ' = ',selecionados[par+1].vetor)
 
         for individuo in individuos:
-            if(random.random()>=PROBABILIDADE_MUTACAO):
+            if(random.random()<=PROBABILIDADE_MUTACAO):
+                
                 pos = random.randint(1,NUMERO_ITENS-2)
                 # print('pos:')
                 # print(pos)
@@ -137,6 +143,7 @@ if __name__ == '__main__':
                     individuo.vetor[pos] = 1
                 else:
                     individuo.vetor[pos] = 0
+        PROBABILIDADE_MUTACAO = PROBABILIDADE_MUTACAO*0.95
         for individuo in individuos:
             individuo.peso = 0
             individuo.volume = 0
