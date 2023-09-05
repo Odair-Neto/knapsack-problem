@@ -2,11 +2,10 @@ import random
 import logging
 from table_test import valores, pesos, tamanhos
 
-logging.basicConfig(level=logging.INFO, filename="test_POP100_MAXITER300_PM10V095_1.log", format="")
 
-PROBABILIDADE_MUTACAO = 0.05
-MAX_ITERACOES = 500
-POPULACAO = 50
+PROBABILIDADE_MUTACAO = 0.10
+MAX_ITERACOES = 300
+POPULACAO = 300
 
 NUMERO_ITENS = 1000
 VOLUME_MAX = 50000
@@ -89,73 +88,76 @@ if __name__ == '__main__':
     for _ in range(1,POPULACAO+1):
         individuos.append(Population())
         selecionados.append(Population())
-    while 1:
-        generate()
-        choice.append(0)
-        num_aval_nulas = 0
-        for individuo in individuos:
-            if avaliativa(individuo) == 0:
-                num_aval_nulas +=1
-        if(num_aval_nulas == 0):
-            break
-
-    for i in range(1,MAX_ITERACOES):
-        print('Iteração ')
-        print(i)
-        #logging.info(i)
-        #logging.info(',')
-        soma_avaliativa = 0
-        aux = True
-        for individuo in individuos:
-            individuo.avaliativa=avaliativa(individuo)
-            soma_avaliativa += individuo.avaliativa
-            print('avaliativa:')
-            print(individuo.avaliativa)
-            if aux:
-                aux = False
-                logging.info(individuo.avaliativa)
-        for individuo in individuos:
-            individuo.ap = individuo.avaliativa/soma_avaliativa
-                
-              # print('ap:')
-              # print(individuo.ap)
-        choice_weights = []
-        for individuo in individuos:
-            choice_weights.append(100*individuo.ap) 
-        print(choice_weights)
-        selecionados = random.choices(individuos, choice_weights, k = POPULACAO)
-
-        for par in range(0,int(POPULACAO/2)):
-            corte = random.randint(1,NUMERO_ITENS-2)
-            individuos[2*par].vetor = cruzamento(selecionados[2*par], selecionados[2*par+1], corte, False)
-            individuos[2*par+1].vetor = cruzamento(selecionados[2*par], selecionados[2*par+1], corte, True)
-            print(individuos[par].vetor)
-            # print('vetor ', par, ' = ',selecionados[par].vetor)
-            # print('vetor ', par+1, ' = ',selecionados[par+1].vetor)
-
-        for individuo in individuos:
-            if(random.random()<=PROBABILIDADE_MUTACAO):
-                
-                pos = random.randint(1,NUMERO_ITENS-2)
-                # print('pos:')
-                # print(pos)
-                if(individuo.vetor[pos] == 0):
-                    individuo.vetor[pos] = 1
-                else:
-                    individuo.vetor[pos] = 0
-        PROBABILIDADE_MUTACAO = PROBABILIDADE_MUTACAO*0.95
-        for individuo in individuos:
-            individuo.peso = 0
-            individuo.volume = 0
-            for j in individuo.vetor:
-                individuo.peso += j*pesos[j]
-                individuo.volume += j*tamanhos[j]
-            # print('peso = ')
-            # print(individuo.peso)
-            # print('volume = ')
-            # print(individuo.volume)
-            if individuo.peso > PESO_MAX or individuo.volume > VOLUME_MAX:
-                individuo.vetor = vetor_nulo(NUMERO_ITENS)
-    
-    #for individuo in individuos:
-        #print(individuo.vetor)
+    for cycle in range(1,6):
+        logging.basicConfig(level=logging.INFO, filename="test_POP300_MAXITER300_PM10V095_"+str(cycle)+".log", format="")
+        choice = [0,1]
+        while 1:
+            generate()
+            choice.append(0)
+            num_aval_nulas = 0
+            for individuo in individuos:
+                if avaliativa(individuo) == 0:
+                    num_aval_nulas +=1
+            if(num_aval_nulas == 0):
+                break
+        
+        for i in range(1,MAX_ITERACOES):
+            print('Iteração ')
+            print(i)
+            #logging.info(i)
+            #logging.info(',')
+            soma_avaliativa = 0
+            aux = True
+            for individuo in individuos:
+                individuo.avaliativa=avaliativa(individuo)
+                soma_avaliativa += individuo.avaliativa
+                print('avaliativa:')
+                print(individuo.avaliativa)
+                if aux:
+                    aux = False
+                    logging.info(individuo.avaliativa)
+            for individuo in individuos:
+                individuo.ap = individuo.avaliativa/soma_avaliativa
+                    
+                  # print('ap:')
+                  # print(individuo.ap)
+            choice_weights = []
+            for individuo in individuos:
+                choice_weights.append(100*individuo.ap) 
+            print(choice_weights)
+            selecionados = random.choices(individuos, choice_weights, k = POPULACAO)
+        
+            for par in range(0,int(POPULACAO/2)):
+                corte = random.randint(1,NUMERO_ITENS-2)
+                individuos[2*par].vetor = cruzamento(selecionados[2*par], selecionados[2*par+1], corte, False)
+                individuos[2*par+1].vetor = cruzamento(selecionados[2*par], selecionados[2*par+1], corte, True)
+                print(individuos[par].vetor)
+                # print('vetor ', par, ' = ',selecionados[par].vetor)
+                # print('vetor ', par+1, ' = ',selecionados[par+1].vetor)
+        
+            for individuo in individuos:
+                if(random.random()<=PROBABILIDADE_MUTACAO):
+                    
+                    pos = random.randint(1,NUMERO_ITENS-2)
+                    # print('pos:')
+                    # print(pos)
+                    if(individuo.vetor[pos] == 0):
+                        individuo.vetor[pos] = 1
+                    else:
+                        individuo.vetor[pos] = 0
+            PROBABILIDADE_MUTACAO = PROBABILIDADE_MUTACAO*0.95
+            for individuo in individuos:
+                individuo.peso = 0
+                individuo.volume = 0
+                for j in individuo.vetor:
+                    individuo.peso += j*pesos[j]
+                    individuo.volume += j*tamanhos[j]
+                # print('peso = ')
+                # print(individuo.peso)
+                # print('volume = ')
+                # print(individuo.volume)
+                if individuo.peso > PESO_MAX or individuo.volume > VOLUME_MAX:
+                    individuo.vetor = vetor_nulo(NUMERO_ITENS)
+        
+        #for individuo in individuos:
+            #print(individuo.vetor)
