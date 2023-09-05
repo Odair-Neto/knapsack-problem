@@ -42,13 +42,11 @@ def avaliativa(individuo):
     for i in individuo.vetor:
         valor += individuo.vetor[j]*valores[j]
         j+=1
-    #print(valor)
     return valor
 
 def generate():
     for individuo in individuos:
         individuo.vetor = vetor_aleatorio(NUMERO_ITENS,choice)
-        #print(individuo.vetor)
         x = 0
         individuo.peso = 0
         individuo.volume = 0
@@ -73,10 +71,6 @@ def cruzamento(selecionado1, selecionado2, corte, bool):
         buffer4.append(selecionado2.vetor[i])
         j+=1
     
-    #print(buffer1)
-    #print(buffer2)
-    #print(buffer3)
-    #print(buffer4)
     if(bool):
         return buffer1 + buffer4
     else:
@@ -102,26 +96,22 @@ if __name__ == '__main__':
                 break
         
         for i in range(1,MAX_ITERACOES):
-            print('Iteração ')
-            print(i)
-            #logging.info(i)
-            #logging.info(',')
+            #print('Iteração ')
+            #print(i)
             soma_avaliativa = 0
             aux = True
             for individuo in individuos:
                 individuo.avaliativa=avaliativa(individuo)
                 soma_avaliativa += individuo.avaliativa
-                print('avaliativa:')
-                print(individuo.avaliativa)
+                #print('avaliativa:')
+                #print(individuo.avaliativa)
                 if aux:
                     aux = False
                     logging.info(individuo.avaliativa)
             for individuo in individuos:
                 individuo.ap = individuo.avaliativa/soma_avaliativa
-                    
-                  # print('ap:')
-                  # print(individuo.ap)
             choice_weights = []
+            
             for individuo in individuos:
                 choice_weights.append(100*individuo.ap) 
             print(choice_weights)
@@ -132,15 +122,10 @@ if __name__ == '__main__':
                 individuos[2*par].vetor = cruzamento(selecionados[2*par], selecionados[2*par+1], corte, False)
                 individuos[2*par+1].vetor = cruzamento(selecionados[2*par], selecionados[2*par+1], corte, True)
                 print(individuos[par].vetor)
-                # print('vetor ', par, ' = ',selecionados[par].vetor)
-                # print('vetor ', par+1, ' = ',selecionados[par+1].vetor)
         
             for individuo in individuos:
                 if(random.random()<=PROBABILIDADE_MUTACAO):
-                    
                     pos = random.randint(1,NUMERO_ITENS-2)
-                    # print('pos:')
-                    # print(pos)
                     if(individuo.vetor[pos] == 0):
                         individuo.vetor[pos] = 1
                     else:
@@ -152,12 +137,5 @@ if __name__ == '__main__':
                 for j in individuo.vetor:
                     individuo.peso += j*pesos[j]
                     individuo.volume += j*tamanhos[j]
-                # print('peso = ')
-                # print(individuo.peso)
-                # print('volume = ')
-                # print(individuo.volume)
                 if individuo.peso > PESO_MAX or individuo.volume > VOLUME_MAX:
                     individuo.vetor = vetor_nulo(NUMERO_ITENS)
-        
-        #for individuo in individuos:
-            #print(individuo.vetor)
